@@ -1,0 +1,18 @@
+﻿@using TestNET.ViewModels
+@model HtmlViewModel
+
+<title>Source - @Model.Parent_Link</title>
+
+<body>
+    <h2> Deep - @Model.Deep </h2>
+
+    @{ // here links output
+        foreach (var link in Model.Child_Links)
+        {
+            <div>
+                <a> @link </a>
+            </div>
+        }
+    }
+
+</body>

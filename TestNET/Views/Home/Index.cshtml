@@ -1,0 +1,21 @@
+﻿@{ ViewData["Title"] = "Home Page";}
+@using TestNET.DATA.Models
+@model Config
+
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1> 
+        <br />
+
+        <form asp-action="SetConfig" method="post">
+
+            <div class="form-group">
+                <input asp-for="Url" placeholder="URL" />
+                <input asp-for="Deep" placeholder="Deep" />
+                <input asp-for="Constraint" placeholder="Constraint" />
+                <br /> <hr />
+                <input class="btn btn-success" type="submit" value="Scan" />
+            </div>
+        </form>
+
+</div>
