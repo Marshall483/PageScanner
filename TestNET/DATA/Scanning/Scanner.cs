@@ -23,11 +23,12 @@ namespace TestNET.DATA.Scanning
         private int _constraint;
         private int _deep;
 
-        private List<Dictionary<string, string>> _urlBodyPairs; 
-
         public void ConfigureScanner(Config config)
         {
-            _urlBodyPairs = new List<Dictionary<string, string>>();
+            //Значит цикл в _deep оборотов, в котором на каждом этапе добавляем полученные ссылки 
+            //в очередь, которой будем вереть на следующем этапе.
+            // вернем перечисление отсканированнх сайтов
+
             _domen = ParseDomen(config.Url);
             _constraint = config.Constraint;
             _parentUrl = config.Url;
@@ -50,19 +51,33 @@ namespace TestNET.DATA.Scanning
             return sb.ToString();
         }
 
-        public IEnumerable<Dictionary<string, string>> Scan()
-        {
-            List<string> nextScan = ScanPage(_parentUrl);
-            List<string> temp = new List<string>();
 
-            for (int deep = 0; deep < _deep; deep++)
+        public IEnumerable<string> InitiateScan()
+        {
+            Queue<string> heapToScan = new Queue<string>();
+            heapToScan.Enqueue(_parentUrl);
+            List<string> nextSpin = new List<string>();
+            List<string> aleradyScanned = new List<string>();
+            aleradyScanned.Add(_parentUrl);
+
+            for(int deep = 0; deep < _deep; deep++)
             {
-                foreach (string link in nextScan)
-                    temp.Union(ScanPage(link));
-                nextScan = temp;
+                while (!heapToScan.Count.Equals(0))
+                {
+                    string nextUrl = heapToScan.Dequeue();
+                    List<string> newLinks = ScanPage(nextUrl);
+
+                    newLinks = newLinks.Except(aleradyScanned).ToList();
+                    aleradyScanned = aleradyScanned.Union(newLinks).ToList();
+                    nextSpin = nextSpin.Union(newLinks).ToList();
+                }
+                foreach (var nextLink in nextSpin)
+                    heapToScan.Enqueue(nextLink);
+
+                nextSpin.Clear();
             }
 
-            return _urlBodyPairs;
+            return aleradyScanned;
         }
 
 
@@ -73,23 +88,12 @@ namespace TestNET.DATA.Scanning
 
             var nodes = FindNodesWichLinks(html);
             var links = ExtractDomenLinks(nodes);
-            _urlBodyPairs.Add(SetHtml(links));
 
             return links;
         }
 
         private HtmlNodeCollection FindNodesWichLinks(HtmlDocument html) =>
             html.DocumentNode.SelectNodes("//a/@href");
-
-        private Dictionary<string, string> SetHtml(IEnumerable<string> links)
-        {
-            Dictionary<string, string> pages = new Dictionary<string, string>();
-
-            foreach (string link in links)
-                pages[link] = GetHtmlString(link);
-
-            return pages;
-        }
 
         private List<string> ExtractDomenLinks(HtmlNodeCollection nodes)
         {

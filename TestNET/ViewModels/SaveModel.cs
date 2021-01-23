@@ -7,9 +7,9 @@ namespace TestNET.ViewModels
 {
     public class SaveModel
     {
-
-        public IEnumerable<string> scannedLinks { get; set; }
-        public IEnumerable<string> linksHtml { get; set; }
+        public string Source { get; set; }
+        public string ContentString { get; set; }
+        public IEnumerable<string> ScannedLinks { get; set; }
 
     }
 }

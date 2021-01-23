@@ -27,33 +27,23 @@ namespace TestNET.Controllers
         [HttpPost]
         public IActionResult SetConfig(Config config)
         {
-
             _scanner.ConfigureScanner(config);
-            var res = _scanner.Scan();
-
-            List<string> links = new List<string>();
-            List<string> linksHtml = new List<string>();
-
-            foreach(var dic in res)
-                foreach(var linkAndHtml in dic)
-                {
-                    links.Add(linkAndHtml.Key);
-                    linksHtml.Add(linkAndHtml.Value);
-                }
-
+            var res = _scanner.InitiateScan();
 
             SaveModel model = new SaveModel();
-            model.linksHtml = links;
-            model.scannedLinks = linksHtml;
+            model.Source = config.Url;
+            model.ContentString = String.Join('|', res);
+            model.ScannedLinks = res;
 
             return View(model);
 
         }
 
-        public IActionResult Save(SaveModel model)
+        public IActionResult Save(string scanned)
         {
+            string[] links = scanned.Split('|');
+            
 
-            int a = 0;
 
             return View();
 

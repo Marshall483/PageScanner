@@ -8,7 +8,7 @@ namespace TestNET.DATA.Interfaces
 {
     public interface IScanner
     {
-        public IEnumerable<Dictionary<string, string>> Scan();
+        public IEnumerable<string> InitiateScan();
         public void ConfigureScanner(Config config);
     }
 }
