@@ -15,8 +15,10 @@
         }
     }
 
+        <div class="text-center">
     <form asp-controller="Home" asp-action="Save" method="post">
         <input asp-for="ContentString" value="@Model.ContentString" type="hidden">
-        <input class="btn d-block btn-success" value="Save" type="submit">
+        <input class="btn btn-success" value="Save" type="submit">
     </form>
+        </div>
 </div>
