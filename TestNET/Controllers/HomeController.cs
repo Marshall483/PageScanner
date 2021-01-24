@@ -42,14 +42,14 @@ namespace TestNET.Controllers
         }
 
         [HttpPost]
-        public void Save(SaveModel model  )
+        public IActionResult Save(SaveModel model)
         {
             foreach (var link in model.ContentString.Split('|'))
             {
                 var html = _scanner.GetHtmlString(link);
                 _dbHtmlData.AddLink(link, html);
             }
-            
+            return View();
         }
 
         public IActionResult Index()
