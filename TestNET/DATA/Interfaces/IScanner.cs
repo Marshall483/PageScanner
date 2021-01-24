@@ -10,5 +10,7 @@ namespace TestNET.DATA.Interfaces
     {
         public IEnumerable<string> InitiateScan();
         public void ConfigureScanner(Config config);
+        public string GetHtmlString(string url);
+
     }
 }

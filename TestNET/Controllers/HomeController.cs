@@ -10,6 +10,7 @@ using TestNET.DATA.Models;
 using TestNET.DATA.Scanning;
 using TestNET.DATA.Interfaces;
 using TestNET.ViewModels;
+using TestNET.DATA;
 
 namespace TestNET.Controllers
 {
@@ -17,11 +18,13 @@ namespace TestNET.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IScanner _scanner;
+        private readonly IHtmlData _dbHtmlData;
 
-        public HomeController(ILogger<HomeController> logger,IScanner scanner )
+        public HomeController(ILogger<HomeController> logger, IScanner scanner, IHtmlData htmlData, AppDBContent content)
         {
             _logger = logger;
             _scanner = scanner;
+            _dbHtmlData = htmlData;
         }
 
         [HttpPost]
@@ -36,17 +39,17 @@ namespace TestNET.Controllers
             model.ScannedLinks = res;
 
             return View(model);
-
         }
 
-        public IActionResult Save(string scanned)
+        [HttpPost]
+        public void Save(SaveModel model  )
         {
-            string[] links = scanned.Split('|');
+            foreach (var link in model.ContentString.Split('|'))
+            {
+                var html = _scanner.GetHtmlString(link);
+                _dbHtmlData.AddLink(link, html);
+            }
             
-
-
-            return View();
-
         }
 
         public IActionResult Index()

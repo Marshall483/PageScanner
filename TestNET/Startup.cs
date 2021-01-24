@@ -34,7 +34,7 @@ namespace TestNET
         {     
             services.AddMvc(options => options.EnableEndpointRouting = false);
 
-            services.AddDbContext<AppDBContent>(options => 
+            services.AddDbContext<AppDBContent>(options =>
                 options.UseSqlServer(_connectionString.GetConnectionString("DefaultConnection")));
 
             services.AddTransient<IHtmlData, HtmlRepository>();

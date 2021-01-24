@@ -23,6 +23,8 @@ namespace TestNET.DATA.Scanning
         private int _constraint;
         private int _deep;
 
+        private static List<string> _alreadyScanned = new List<string>();
+
         public void ConfigureScanner(Config config)
         {
             //Значит цикл в _deep оборотов, в котором на каждом этапе добавляем полученные ссылки 
@@ -57,8 +59,7 @@ namespace TestNET.DATA.Scanning
             Queue<string> heapToScan = new Queue<string>();
             heapToScan.Enqueue(_parentUrl);
             List<string> nextSpin = new List<string>();
-            List<string> aleradyScanned = new List<string>();
-            aleradyScanned.Add(_parentUrl);
+            _alreadyScanned.Add(_parentUrl);
 
             for(int deep = 0; deep < _deep; deep++)
             {
@@ -67,8 +68,8 @@ namespace TestNET.DATA.Scanning
                     string nextUrl = heapToScan.Dequeue();
                     List<string> newLinks = ScanPage(nextUrl);
 
-                    newLinks = newLinks.Except(aleradyScanned).ToList();
-                    aleradyScanned = aleradyScanned.Union(newLinks).ToList();
+                    newLinks = newLinks.Except(_alreadyScanned).ToList();
+                    _alreadyScanned = _alreadyScanned.Union(newLinks).ToList();
                     nextSpin = nextSpin.Union(newLinks).ToList();
                 }
                 foreach (var nextLink in nextSpin)
@@ -77,7 +78,7 @@ namespace TestNET.DATA.Scanning
                 nextSpin.Clear();
             }
 
-            return aleradyScanned;
+            return _alreadyScanned;
         }
 
 
@@ -102,19 +103,22 @@ namespace TestNET.DATA.Scanning
             for (int i = 0; i < nodes.Count; i++)
                 hrefs.Add(nodes[i].Attributes["href"].Value);
 
-            return hrefs.Where(href => href.Contains(_domen)).
+            return hrefs.Except(_alreadyScanned).Where(href => href.Contains(_domen)).
                 Take(_constraint).ToList();
         }
 
-        private string GetHtmlString(string url)
+        public string GetHtmlString(string url)
         {
             _request = WebRequest.Create(url);
             _request.Proxy = null;
+            
             _response = _request.GetResponse();
+
             using (StreamReader sReader = new StreamReader(_response.GetResponseStream(), _encode))
             {
                 return sReader.ReadToEnd();
             }
         }
+
     }
 }
