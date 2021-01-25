@@ -9,6 +9,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using TestNET.DATA.Models;
+using System.Collections.Concurrent;
 
 namespace TestNET.DATA.Scanning
 {
@@ -56,18 +57,18 @@ namespace TestNET.DATA.Scanning
 
         public async Task<IEnumerable<string>> InitiateScan()
         {
-            Queue<string> heapToScan = new Queue<string>();
+            ConcurrentQueue<string> heapToScan = new ConcurrentQueue<string>();
             heapToScan.Enqueue(_parentUrl);
             List<string> nextSpin = new List<string>();
             _alreadyScanned.Add(_parentUrl);
+            string nextUrl = "";
 
             for(int deep = 0; deep < _deep; deep++)
             {
                 while (!heapToScan.Count.Equals(0))
                 {
-                    string nextUrl = heapToScan.Dequeue();
-
-                    List<string> newLinks = await ScanPage(nextUrl);
+                    if(heapToScan.TryDequeue(out nextUrl));
+                        List<string> newLinks = await ScanPage(nextUrl);
 
                     newLinks = newLinks.Except(_alreadyScanned).ToList();
                     _alreadyScanned = _alreadyScanned.Union(newLinks).ToList();
