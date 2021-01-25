@@ -28,10 +28,10 @@ namespace TestNET.Controllers
         }
 
         [HttpPost]
-        public IActionResult SetConfig(Config config)
+        public async Task<IActionResult> SetConfig(Config config)
         {
             _scanner.ConfigureScanner(config);
-            var res = _scanner.InitiateScan();
+            var res = await _scanner.InitiateScan();
 
             SaveModel model = new SaveModel();
             model.Source = config.Url;
@@ -42,13 +42,24 @@ namespace TestNET.Controllers
         }
 
         [HttpPost]
-        public IActionResult Save(SaveModel model)
+        public async Task<IActionResult> Save(SaveModel model)
         {
-            foreach (var link in model.ContentString.Split('|'))
-            {
-                var html = _scanner.GetHtmlString(link);
-                _dbHtmlData.AddLink(link, html);
-            }
+            int added = 0;
+            List<Task<string>> tsks = new List<Task<string>>();
+
+            var links = model.ContentString.Split('|');
+
+            foreach (var link in links)
+                tsks.Add(_scanner.GetHtmlStringAsync(link));
+
+            var htmls = await Task.WhenAll(tsks);
+
+            for (int i = 0; i < links.Length; i++)
+                if (_dbHtmlData.AddLink(links[i], htmls[i]))
+                    added++;
+
+            ViewBag.Added = added;
+
             return View();
         }
 

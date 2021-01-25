@@ -6,19 +6,26 @@
 
     <h2>Source - @Model.Source</h2>
 
-    @{ // here links output
-        foreach (var link in Model.ScannedLinks)
-        {
-            <div>
-                <a> @link </a>
-            </div>
-        }
-    }
+    <table class="table table-dark">
+        <thead>
+            <th scope="cal">Link</th>
+        </thead>
+            <tbody>
+                @{
+                    foreach (var link in Model.ScannedLinks)
+                    {
+                        <tr>
+                            <td scope="row"> @link </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+    </table>
 
-        <div class="text-center">
-    <form asp-controller="Home" asp-action="Save" method="post">
-        <input asp-for="ContentString" value="@Model.ContentString" type="hidden">
-        <input class="btn btn-success" value="Save" type="submit">
-    </form>
-        </div>
+    <div class="text-center">
+        <form asp-controller="Home" asp-action="Save" method="post">
+            <input asp-for="ContentString" value="@Model.ContentString" type="hidden">
+            <input class="btn btn-success" value="Save" type="submit">
+        </form>
+    </div>
 </div>

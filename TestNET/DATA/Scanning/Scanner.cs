@@ -54,7 +54,7 @@ namespace TestNET.DATA.Scanning
         }
 
 
-        public IEnumerable<string> InitiateScan()
+        public async Task<IEnumerable<string>> InitiateScan()
         {
             Queue<string> heapToScan = new Queue<string>();
             heapToScan.Enqueue(_parentUrl);
@@ -66,7 +66,8 @@ namespace TestNET.DATA.Scanning
                 while (!heapToScan.Count.Equals(0))
                 {
                     string nextUrl = heapToScan.Dequeue();
-                    List<string> newLinks = ScanPage(nextUrl);
+
+                    List<string> newLinks = await ScanPage(nextUrl);
 
                     newLinks = newLinks.Except(_alreadyScanned).ToList();
                     _alreadyScanned = _alreadyScanned.Union(newLinks).ToList();
@@ -81,11 +82,16 @@ namespace TestNET.DATA.Scanning
             return _alreadyScanned;
         }
 
-
-        public List<string> ScanPage(string url)
+        /// <summary>
+        ///  Scanning one page and return a List wich _constraint elemnts
+        /// </summary>
+        /// <param name="url"> URL page </param>
+        /// <returns></returns>
+        public async Task<List<string>> ScanPage(string url)
         {
             var html = new HtmlDocument();
-            html.LoadHtml(GetHtmlString(url));
+            var htmlString = await GetHtmlStringAsync(url);
+            html.LoadHtml(htmlString);
 
             var nodes = FindNodesWichLinks(html);
             var links = ExtractDomenLinks(nodes);
@@ -107,16 +113,16 @@ namespace TestNET.DATA.Scanning
                 Take(_constraint).ToList();
         }
 
-        public string GetHtmlString(string url)
+        public async Task<string> GetHtmlStringAsync(string url)
         {
             _request = WebRequest.Create(url);
             _request.Proxy = null;
             
-            _response = _request.GetResponse();
+            _response = await _request.GetResponseAsync();
 
             using (StreamReader sReader = new StreamReader(_response.GetResponseStream(), _encode))
             {
-                return sReader.ReadToEnd();
+                return await sReader.ReadToEndAsync();
             }
         }
 

@@ -8,9 +8,13 @@ namespace TestNET.DATA.Interfaces
 {
     public interface IScanner
     {
-        public IEnumerable<string> InitiateScan();
+        public async Task<IEnumerable<string>> InitiateScan() {
+            return new List<string>();
+        }
         public void ConfigureScanner(Config config);
-        public string GetHtmlString(string url);
+        public async Task<string> GetHtmlStringAsync(string url){
+            return "";
+        }
 
     }
 }

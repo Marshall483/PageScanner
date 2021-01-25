@@ -18,10 +18,17 @@ namespace TestNET.DATA.Repository
 
         public IEnumerable<HTMLSource> GetAllHtml => _dBContent.Sources;
 
-        public void AddLink(string link, string html)
+        public bool AddLink(string link, string html)
         {
             _dBContent.Sources.Add(new HTMLSource { Link = link, Content = html });
-            _dBContent.SaveChanges();
+
+            try { 
+                _dBContent.SaveChanges();
+            }
+            catch(Exception) { 
+                return false; 
+            }
+            return true;
         }
     }
 }
